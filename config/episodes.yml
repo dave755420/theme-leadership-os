@@ -20,6 +20,17 @@ early_hit:
   onset_before_weeks: 4
   onset_after_weeks: 8
   max_realized_log_fraction: 0.25
+early_rise_signal:
+  history_weeks: 26
+  min_4w_rank: 0.70
+  min_acceleration_rank: 0.70
+  min_rank_improvement_4v13: 0.10
+  min_breadth_4w: 0.50
+  min_participation: 0.50
+  min_4w_spy_excess: 0.00
+  min_26w_spy_excess: -0.30
+  confirmation_count: 2
+  confirmation_window_weeks: 3
 forward_labels:
   horizons_weeks: [13, 26, 52]
   execution: next_session

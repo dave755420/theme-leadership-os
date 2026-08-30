@@ -26,9 +26,9 @@ Street Insight Daily remains blocked until the core validation gate passes.
 | Catalog | `load_catalog()` reads the versioned `themes.yaml`, `memberships.csv`, and optional `sources.yaml` bundle | The seed catalog is curated and coverage is explicitly partial for several themes; missing history is not fabricated |
 | Data | `SourceManifest` checksums, `MemoryCache`/`FileCache`, provider-neutral `PriceProvider`, and deterministic `CSVPriceProvider`/`CSVFixtureProvider` | The default path is local; raw provider response objects do not cross the provider boundary |
 | Personal adapter | Opt-in `YFinancePriceProvider` / `PersonalResearchPriceProvider` gated by `THEME_LEADERSHIP_ENABLE_YFINANCE` or `enabled=True` | Personal-research only, non-redistributable, and not PIT-complete; it is never an automatic catalog source |
-| Signals | `current_leader`, `emerging_radar`, and `hold_candidate_12m` with typed configs and transparent component/gate columns | Tidy DataFrame input is required; weekly decisions use Friday-ending weeks and no later observations |
+| Signals | `current_leader`, `emerging_radar`, `hold_candidate_12m`, annual leaders, and early-rise signals with typed configs and transparent component/gate columns | Tidy DataFrame input is required; weekly decisions use Friday-ending weeks and no later observations |
 | Validation | Integrity audits, cross-sectional rank/spread/hit metrics, purged walk-forward splits, episode/early-hit labels, and holdout challenge metadata | The exploratory baseline is rejected; passing the core gate still requires a clean PIT-complete run and review |
-| Presentation | Local CLI (`doctor`, `catalog`, `score`, `validate`, `dashboard`) and optional Streamlit dashboard | Presentation does not change signal values or turn research candidates into recommendations |
+| Presentation | Local CLI (`doctor`, `catalog`, `score`, `validate`, `annual`, `dashboard`) and optional Streamlit dashboard | Presentation does not change signal values or turn research candidates into recommendations |
 
 ## The three product outputs
 
@@ -46,6 +46,16 @@ The lane boundary is a correctness boundary. A theme may appear in one lane
 without being copied into another; moving a theme requires an explicit,
 versioned rule and a new as-of record. No lane may conceal an unrun or failed
 validation gate.
+
+The annual/early view is a separate research surface, not a fourth product
+lane. `annual_theme_leaders()` ranks calendar-year theme returns against SPY
+with a coverage gate. `early_rise_signals()` uses only information available on
+each Friday: 4-week versus 13-week relative-strength acceleration,
+cross-sectional rank improvement, breadth, participation, a bounded 26-week M0
+floor, and a two-of-three-week persistence rule. It emits `초입 관찰` and
+`초입 확인` statuses and never uses the future 52-week outcome to create the
+signal. Full thresholds and the exploratory table are in
+[`ANNUAL_LEADERSHIP.md`](ANNUAL_LEADERSHIP.md).
 
 The v0.1 signal engines implement these lanes as full decision-date/theme
 panels:

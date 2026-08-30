@@ -20,6 +20,12 @@ from .signals import (
     emerging_radar,
     hold_candidate_12m,
 )
+from .validation import (
+    AnnualLeadershipConfig,
+    annual_leadership_report,
+    annual_theme_leaders,
+    early_rise_signals,
+)
 
 __version__ = "0.1.0"
 
@@ -38,4 +44,8 @@ __all__ = [
     "emerging_radar",
     "hold_candidate_12m",
     "run_signal_pipeline",
+    "AnnualLeadershipConfig",
+    "annual_theme_leaders",
+    "early_rise_signals",
+    "annual_leadership_report",
 ]

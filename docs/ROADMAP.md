@@ -39,6 +39,9 @@ source registry with PIT-complete coverage and permitted derived use.
   with visible quality warnings and watchlist-only language.
 - `hold_candidate_12m()` applies 13/26/52-week durability, confirmation,
   concentration, volatility, and drawdown gates.
+- `annual_theme_leaders()` ranks each calendar year against SPY, while
+  `early_rise_signals()` emits a no-lookahead `초입 관찰`/`초입 확인` status from
+  4·8·13-week acceleration, breadth, participation, M0, and 2/3-week persistence.
 - All engines use Friday-ending weekly decisions, retain rejected rows and gate
   reasons, and label the next effective session without using it in the signal.
 

@@ -52,8 +52,17 @@ def test_help_lists_commands() -> None:
     )
     assert completed.returncode == 0
     help_text = completed.stdout + completed.stderr
-    for command in ("doctor", "catalog", "score", "validate", "dashboard"):
+    for command in ("doctor", "catalog", "score", "validate", "annual", "dashboard"):
         assert command in help_text
+
+
+def test_annual_demo_emits_leaders_and_signals(capsys: pytest.CaptureFixture[str]) -> None:
+    from theme_leadership_os.cli import _run_annual
+
+    assert _run_annual(demo=True) == 0
+    output = capsys.readouterr().out
+    assert "연도별 주도 테마" in output
+    assert "최신 초입 신호" in output
 
 
 def test_score_accepts_wide_csv_without_network() -> None:

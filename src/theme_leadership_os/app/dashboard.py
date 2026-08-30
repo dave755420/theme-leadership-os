@@ -119,10 +119,10 @@ def _bucket_for_score(score: float) -> str:
 
 def _confidence_label(confidence: float) -> str:
     if confidence >= 0.80:
-        return "High"
+        return "높음"
     if confidence >= 0.55:
-        return "Medium"
-    return "Low"
+        return "중간"
+    return "낮음"
 
 
 def _default_components(score: float) -> dict[str, float]:
@@ -145,14 +145,14 @@ def _flat_row(row: Mapping[str, Any]) -> dict[str, Any]:
     if isinstance(flags, str):
         flags = [flags]
     return {
-        "Theme": row.get("entity") or row.get("theme") or "Unknown",
-        "Score": round(_number(row.get("score"), 0.0), 1),
-        "Data confidence": f'{_number(row.get("data_confidence"), 0.0):.1f}%',
-        "As-of": row.get("as_of") or "unknown",
-        "Freshness": (
-            f'{row["freshness_days"]}d old' if row.get("freshness_days") is not None else "unknown"
+        "테마": row.get("entity") or row.get("theme") or "알 수 없음",
+        "점수": round(_number(row.get("score"), 0.0), 1),
+        "자료 신뢰도": f'{_number(row.get("data_confidence"), 0.0):.1f}%',
+        "기준일": row.get("as_of") or "알 수 없음",
+        "자료 경과": (
+            f'{row["freshness_days"]}일 전' if row.get("freshness_days") is not None else "알 수 없음"
         ),
-        "Risk flags": ", ".join(str(flag) for flag in flags),
+        "위험 경고": ", ".join(str(flag) for flag in flags),
     }
 
 
@@ -167,38 +167,43 @@ def _render_candidate(st: Any, row: Mapping[str, Any]) -> None:
         flags = [flags]
     st.subheader(str(entity))
     columns = st.columns(4)
-    columns[0].metric("Signal score", f"{score:.1f}/100")
-    columns[1].metric("Data confidence", f"{confidence:.1f}%")
-    columns[2].metric("As-of", str(row.get("as_of") or "unknown"))
+    columns[0].metric("신호 점수", f"{score:.1f}/100")
+    columns[1].metric("자료 신뢰도", f"{confidence:.1f}%")
+    columns[2].metric("기준일", str(row.get("as_of") or "알 수 없음"))
     columns[3].metric(
-        "Freshness",
-        f'{row.get("freshness_days")}d' if row.get("freshness_days") is not None else "unknown",
+        "자료 경과",
+        f'{row.get("freshness_days")}일' if row.get("freshness_days") is not None else "알 수 없음",
     )
 
     if flags and flags != ["none flagged"]:
-        st.warning("Risk flags: " + ", ".join(str(flag) for flag in flags))
+        st.warning("위험 경고: " + ", ".join(str(flag) for flag in flags))
     else:
-        st.success("Risk flags: none flagged")
+        st.success("위험 경고 없음")
 
     components = row.get("components") or {}
     weights = row.get("component_weights") or COMPONENT_WEIGHTS
-    st.markdown("**Component transparency**")
+    st.markdown("**구성요소 투명성**")
     component_rows = []
     for name, weight in weights.items():
         value = _number(components.get(name), 0.0) if isinstance(components, Mapping) else 0.0
         component_rows.append(
             {
-                "Component": str(name).replace("_", " ").title(),
-                "Weight": f"{_number(weight, 0.0) * 100:.0f}%",
-                "Value": f"{value:.1f}/100",
-                "Contribution": f"{value * _number(weight, 0.0):.1f}",
+                "구성요소": {
+                    "momentum": "모멘텀",
+                    "breadth": "breadth",
+                    "quality": "품질",
+                    "risk_control": "위험 통제",
+                }.get(str(name), str(name)),
+                "가중치": f"{_number(weight, 0.0) * 100:.0f}%",
+                "값": f"{value:.1f}/100",
+                "기여도": f"{value * _number(weight, 0.0):.1f}",
             }
         )
     st.dataframe(_as_dataframe(component_rows), use_container_width=True, hide_index=True)
     if row.get("observations") is not None:
         st.caption(
-            f"Evidence: {row['observations']} observations. "
-            "Confidence is data quality, not expected return."
+            f"근거: 관측치 {row['observations']}개. "
+            "신뢰도는 자료 품질이며 기대수익률 확률이 아닙니다."
         )
 
 
@@ -220,34 +225,39 @@ def render_dashboard(
         except Exception:
             return 2
     rows, source = load_scorecard(data_path)
-    st.set_page_config(page_title="Theme Leadership OS", page_icon="🧭", layout="wide")
+    st.set_page_config(page_title="Theme Leadership OS · 테마 주도권 리서치", page_icon="🧭", layout="wide")
     st.title("Theme Leadership OS")
-    st.caption("Local-first research console · transparent scorecard · no automatic live fetch")
+    st.caption("로컬 우선 리서치 콘솔 · 투명한 점수표 · 실시간 자동 수집 없음")
     # Keep the safety language visually prominent on every render.
-    st.error("RESEARCH CANDIDATE, NOT AN INVESTMENT RECOMMENDATION")
-    st.info(f"Data source: {source}. Scores are hypotheses for research, not personalized advice.")
+    st.error("연구·관찰용 결과이며 투자 권고가 아닙니다")
+    st.info(f"자료 출처: {source}. 점수는 연구 가설이며 개인화된 조언이 아닙니다.")
 
     if rows:
         as_of_values = [str(row.get("as_of")) for row in rows if row.get("as_of")]
         freshest = max(as_of_values) if as_of_values else "unknown"
         st.markdown(
-            f"**Freshness / as-of:** latest row {freshest} · "
-            "each candidate shows its own age and flags."
+            f"**자료 경과 / 기준일:** 최신 행 {freshest} · "
+            "각 후보의 자료 경과와 경고를 표시합니다."
         )
-    st.subheader("How to read the score")
+    st.subheader("점수 읽는 법")
     st.markdown(
-        "The composite is intentionally inspectable: **Momentum 40% · Breadth 25% · "
-        "Quality 20% · Risk control 15%**. Data confidence describes coverage and recency; "
-        "it is not a probability of performance."
+        "합성 점수는 구성요소를 공개합니다: **모멘텀 40% · breadth 25% · "
+        "품질 20% · 위험 통제 15%**. 자료 신뢰도는 커버리지와 최신성을 뜻하며 "
+        "성과 확률이 아닙니다."
     )
 
-    tab_objects = st.tabs(list(TAB_LABELS))
-    for tab, label in zip(tab_objects, TAB_LABELS):
+    display_labels = ("현재 주도", "초입 레이더", "12개월 검토")
+    tab_objects = st.tabs(list(display_labels))
+    for tab, label, display_label in zip(tab_objects, TAB_LABELS, display_labels):
         with tab:
             lane_rows = [row for row in rows if row.get("bucket") == label]
-            st.header(label)
+            st.header({
+                "현재 주도": "현재 주도 테마",
+                "초입 레이더": "초입 상승 레이더",
+                "12개월 검토": "12개월 검토 후보",
+            }[display_label])
             if not lane_rows:
-                st.caption("No candidates in this lane for the current local extract.")
+                st.caption("현재 로컬 추출본에는 이 구간의 후보가 없습니다.")
                 continue
             st.dataframe(
                 _as_dataframe([_flat_row(row) for row in lane_rows]),
@@ -256,10 +266,10 @@ def render_dashboard(
             )
             for row in lane_rows:
                 with st.expander(
-                    f"{row.get('entity', 'Unknown')} · inspect evidence", expanded=True
+                    f"{row.get('entity', '알 수 없음')} · 근거 펼쳐보기", expanded=True
                 ):
                     _render_candidate(st, row)
-    st.caption(DISCLAIMER)
+    st.caption("연구·관찰용 결과이며 투자 권고가 아닙니다.")
     return 0
 
 

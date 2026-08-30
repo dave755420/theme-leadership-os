@@ -629,6 +629,47 @@ def synthetic_demo_rows() -> list[dict[str, Any]]:
     return rows
 
 
+def annual_demo_frame() -> Any:
+    """Return a compact Korean-labelled tidy panel for ``annual --demo``."""
+
+    try:
+        import pandas as pd  # type: ignore
+    except Exception:
+        return None
+    dates = pd.date_range("2022-01-07", periods=150, freq="W-FRI")
+    levels = {"SPY": 100.0, "태양광": 100.0, "반도체": 100.0, "양자컴퓨팅": 100.0}
+    rows: list[dict[str, Any]] = []
+    for i, date in enumerate(dates):
+        rates = {
+            "SPY": 0.002,
+            "태양광": 0.001 if i < 65 else 0.018,
+            "반도체": 0.004 if i < 95 else 0.014,
+            "양자컴퓨팅": 0.001 if i < 120 else 0.022,
+        }
+        for security, rate in rates.items():
+            levels[security] *= 1.0 + rate
+            rows.append(
+                {
+                    "date": date,
+                    "theme": "__market__" if security == "SPY" else security,
+                    "security": security,
+                    "value": levels[security],
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def _frame_records(frame: Any) -> list[dict[str, Any]]:
+    """Convert a pandas frame to JSON-safe records without leaking NaN."""
+
+    if frame is None or getattr(frame, "empty", True):
+        return []
+    import pandas as pd  # type: ignore
+
+    safe = frame.astype(object).where(pd.notna(frame), None)
+    return safe.to_dict(orient="records")
+
+
 def _catalog_items(path: Path | None = None) -> tuple[Path | None, list[dict[str, Any]]]:
     # Prefer the versioned catalog loader when the canonical themes.yaml +
     # memberships.csv pair is present.  This keeps catalog output aligned with
@@ -918,6 +959,86 @@ def _run_score(
     return 0
 
 
+def _run_annual(
+    path: Path | None = None,
+    *,
+    input_path: Path | None = None,
+    json_output: bool = False,
+    output_format: str = "table",
+    demo: bool = False,
+    as_of: str | None = None,
+) -> int:
+    """연도 리더와 최신 초입 신호를 로컬 데이터에서 계산한다."""
+
+    selected = input_path or path
+    if demo or selected is None:
+        frame = annual_demo_frame()
+        source = "내장 합성 데모"
+    else:
+        try:
+            raw_rows = _read_rows(selected)
+            frame = _tidy_signal_frame(raw_rows)
+        except (OSError, ValueError, json.JSONDecodeError) as exc:
+            print(f"입력 파일을 읽을 수 없습니다: {exc}", file=sys.stderr)
+            return 2
+        source = str(selected)
+        if frame is None or frame.empty:
+            print(
+                "연도 분석에는 date, theme, security, value 열이 필요합니다.",
+                file=sys.stderr,
+            )
+            return 2
+    try:
+        from .validation import annual_theme_leaders, early_rise_signals
+
+        leaders = annual_theme_leaders(frame, as_of=as_of)
+        early = early_rise_signals(frame, as_of=as_of)
+    except (TypeError, ValueError, KeyError) as exc:
+        print(f"연도/초입 신호를 계산할 수 없습니다: {exc}", file=sys.stderr)
+        return 2
+
+    if early.empty:
+        latest = early
+    else:
+        latest = early.sort_values("decision_date").groupby("theme", sort=True).tail(1)
+        latest = latest.loc[latest["early_watch"] | latest["early_confirmed"]]
+    payload = {
+        "source": source,
+        "annual_leaders": _frame_records(leaders),
+        "latest_early_signals": _frame_records(latest),
+        "disclaimer": "무료 공개 데이터 기반 연구·관찰용 결과이며 투자 권고나 매수 신호가 아닙니다.",
+    }
+    if _as_json(json_output, output_format):
+        _emit(payload, json_output=True)
+        return 0
+    table_rows = [
+        (
+            row["period_label"],
+            row["theme"],
+            f'{float(row["theme_return"]) * 100:.1f}%',
+            f'{float(row["excess_return"]) * 100:.1f}%',
+            row["rank"],
+            f'{float(row["coverage"]) * 100:.0f}%',
+        )
+        for _, row in leaders.iterrows()
+    ]
+    print("[연도별 주도 테마]")
+    print(_format_table(("기간", "테마", "테마 수익률", "시장 초과", "순위", "자료 충족률"), table_rows))
+    signal_rows = [
+        (
+            str(row["decision_date"])[:10],
+            row["theme"],
+            row["signal_type"],
+            f'{float(row["rs_4w"]) * 100:.1f}%' if row["rs_4w"] is not None else "",
+            f'{float(row["breadth_4w"]) * 100:.0f}%' if row["breadth_4w"] is not None else "",
+        )
+        for _, row in latest.iterrows()
+    ]
+    print("\n[최신 초입 신호]")
+    print(_format_table(("기준일", "테마", "상태", "4주 시장초과", "4주 breadth"), signal_rows))
+    return 0
+
+
 def _run_validate(
     path: Path | None = None,
     *,
@@ -1087,6 +1208,34 @@ if typer is not None:
             )
         )
 
+    @app.command("annual")
+    def annual(
+        path: Path | None = typer.Argument(None, help="date,theme,security,value 형식의 로컬 파일."),
+        input_path: Path | None = typer.Option(
+            None,
+            "--input",
+            "--csv",
+            "-i",
+            help="주간 가격 패널 CSV/JSON.",
+        ),
+        json_output: bool = typer.Option(False, "--json", help="기계 판독용 JSON 출력."),
+        output_format: str = typer.Option("table", "--format", help="출력 형식: table 또는 json."),
+        demo: bool = typer.Option(False, "--demo", help="내장 합성 데이터로 실행."),
+        as_of: str | None = typer.Option(None, "--as-of", help="미래 행을 제외할 기준일(YYYY-MM-DD)."),
+    ) -> None:
+        """연도별 상승 테마와 초입 상승 신호를 계산한다."""
+
+        _raise_typer_exit(
+            _run_annual(
+                path,
+                input_path=input_path,
+                json_output=json_output,
+                output_format=output_format,
+                demo=demo,
+                as_of=as_of,
+            )
+        )
+
     @app.command("dashboard")
     def dashboard(
         data_path: Path | None = typer.Option(
@@ -1126,6 +1275,7 @@ else:
     catalog = _run_catalog
     score = _run_score
     validate = _run_validate
+    annual = _run_annual
     dashboard = _run_dashboard
 
 
@@ -1142,6 +1292,7 @@ def _fallback_parser() -> argparse.ArgumentParser:
     for name, help_text in (
         ("score", "Score local long/wide CSV or JSON."),
         ("validate", "Validate a local extract."),
+        ("annual", "연도별 주도 테마와 초입 신호를 계산."),
     ):
         command_parser = subparsers.add_parser(name, help=help_text)
         command_parser.add_argument("path", nargs="?", type=Path)
@@ -1151,6 +1302,9 @@ def _fallback_parser() -> argparse.ArgumentParser:
         if name == "score":
             command_parser.add_argument("--demo", action="store_true")
             command_parser.add_argument("--live", action="store_true")
+        if name == "annual":
+            command_parser.add_argument("--demo", action="store_true")
+            command_parser.add_argument("--as-of")
     dashboard_parser = subparsers.add_parser("dashboard", help="Launch the Streamlit dashboard.")
     dashboard_parser.add_argument("--data", "--input", "-i", type=Path, dest="data_path")
     dashboard_parser.add_argument("--port", type=int, default=8501)
@@ -1181,6 +1335,8 @@ def main(args: Sequence[str] | None = None) -> int:
         return _run_score(**values)
     if command == "validate":
         return _run_validate(**values)
+    if command == "annual":
+        return _run_annual(**values)
     if command == "dashboard":
         return _run_dashboard(**values)
     parser.print_help()

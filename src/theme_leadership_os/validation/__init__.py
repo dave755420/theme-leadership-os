@@ -22,6 +22,14 @@ from .audits import (
     run_integrity_audit,
     validate_features,
 )
+from .annual import (
+    ANNUAL_DISCLAIMER_KO,
+    EARLY_RECOMMENDATION_KO,
+    AnnualLeadershipConfig,
+    annual_leadership_report,
+    annual_theme_leaders,
+    early_rise_signals,
+)
 from .challenge_cases import (
     CHALLENGE_CASES,
     NEGATIVE_CONTROLS,
@@ -90,6 +98,12 @@ from .splits import (
 )
 
 __all__ = [
+    "ANNUAL_DISCLAIMER_KO",
+    "EARLY_RECOMMENDATION_KO",
+    "AnnualLeadershipConfig",
+    "annual_theme_leaders",
+    "early_rise_signals",
+    "annual_leadership_report",
     "AuditIssue",
     "IntegrityAuditResult",
     "IntegrityError",

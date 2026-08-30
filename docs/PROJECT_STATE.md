@@ -21,9 +21,12 @@ passing.
 - Three deterministic signal engines for `Current Leader`, `Emerging Radar`, and
   `12M Hold Candidate`, including M0, weekly windows, quality warnings, and
   next-session labels.
+- 연도별 테마 수익률·SPY 초과수익률 순위표와 미래 데이터를 사용하지 않는
+  `초입 관찰`/`초입 확인` 레이더(`annual_theme_leaders`,
+  `early_rise_signals`).
 - Validation primitives for integrity audits, rank/spread/hit metrics, purged
   walk-forward splits, episode/early-hit labels, and holdout challenge metadata.
-- Local-first CLI (`doctor`, `catalog`, `score`, `validate`, `dashboard`) and an
+- Local-first CLI (`doctor`, `catalog`, `score`, `validate`, `annual`, `dashboard`) and an
   optional Streamlit presentation dashboard.
 - Architecture, data policy, validation protocol, roadmap, and release-gate
   documentation.
