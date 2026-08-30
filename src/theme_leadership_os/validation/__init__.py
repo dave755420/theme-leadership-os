@@ -5,6 +5,14 @@ signals, features, and metadata; validation functions return deterministic
 tables/reports that can be persisted alongside a backtest.
 """
 
+from .annual import (
+    ANNUAL_DISCLAIMER_KO,
+    EARLY_RECOMMENDATION_KO,
+    AnnualLeadershipConfig,
+    annual_leadership_report,
+    annual_theme_leaders,
+    early_rise_signals,
+)
 from .audits import (
     AuditIssue,
     IntegrityAuditResult,
@@ -21,14 +29,6 @@ from .audits import (
     check_integrity,
     run_integrity_audit,
     validate_features,
-)
-from .annual import (
-    ANNUAL_DISCLAIMER_KO,
-    EARLY_RECOMMENDATION_KO,
-    AnnualLeadershipConfig,
-    annual_leadership_report,
-    annual_theme_leaders,
-    early_rise_signals,
 )
 from .challenge_cases import (
     CHALLENGE_CASES,

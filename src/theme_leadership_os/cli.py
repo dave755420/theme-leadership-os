@@ -1006,7 +1006,10 @@ def _run_annual(
         "source": source,
         "annual_leaders": _frame_records(leaders),
         "latest_early_signals": _frame_records(latest),
-        "disclaimer": "무료 공개 데이터 기반 연구·관찰용 결과이며 투자 권고나 매수 신호가 아닙니다.",
+        "disclaimer": (
+            "무료 공개 데이터 기반 연구·관찰용 결과이며 "
+            "투자 권고나 매수 신호가 아닙니다."
+        ),
     }
     if _as_json(json_output, output_format):
         _emit(payload, json_output=True)
@@ -1023,7 +1026,12 @@ def _run_annual(
         for _, row in leaders.iterrows()
     ]
     print("[연도별 주도 테마]")
-    print(_format_table(("기간", "테마", "테마 수익률", "시장 초과", "순위", "자료 충족률"), table_rows))
+    print(
+        _format_table(
+            ("기간", "테마", "테마 수익률", "시장 초과", "순위", "자료 충족률"),
+            table_rows,
+        )
+    )
     signal_rows = [
         (
             str(row["decision_date"])[:10],
@@ -1035,7 +1043,12 @@ def _run_annual(
         for _, row in latest.iterrows()
     ]
     print("\n[최신 초입 신호]")
-    print(_format_table(("기준일", "테마", "상태", "4주 시장초과", "4주 breadth"), signal_rows))
+    print(
+        _format_table(
+            ("기준일", "테마", "상태", "4주 시장초과", "4주 breadth"),
+            signal_rows,
+        )
+    )
     return 0
 
 
@@ -1210,7 +1223,9 @@ if typer is not None:
 
     @app.command("annual")
     def annual(
-        path: Path | None = typer.Argument(None, help="date,theme,security,value 형식의 로컬 파일."),
+        path: Path | None = typer.Argument(
+            None, help="date,theme,security,value 형식의 로컬 파일."
+        ),
         input_path: Path | None = typer.Option(
             None,
             "--input",
@@ -1219,9 +1234,13 @@ if typer is not None:
             help="주간 가격 패널 CSV/JSON.",
         ),
         json_output: bool = typer.Option(False, "--json", help="기계 판독용 JSON 출력."),
-        output_format: str = typer.Option("table", "--format", help="출력 형식: table 또는 json."),
+        output_format: str = typer.Option(
+            "table", "--format", help="출력 형식: table 또는 json."
+        ),
         demo: bool = typer.Option(False, "--demo", help="내장 합성 데이터로 실행."),
-        as_of: str | None = typer.Option(None, "--as-of", help="미래 행을 제외할 기준일(YYYY-MM-DD)."),
+        as_of: str | None = typer.Option(
+            None, "--as-of", help="미래 행을 제외할 기준일(YYYY-MM-DD)."
+        ),
     ) -> None:
         """연도별 상승 테마와 초입 상승 신호를 계산한다."""
 

@@ -2,7 +2,8 @@
 
 이 모듈은 ``signals.core``의 동일한 주간·PIT(시점 기준) 가격 준비 로직을
 재사용한다. 따라서 연도별 순위표와 초입 레이더가 서로 다른 데이터 처리
-규칙을 사용하지 않는다. 반환값은 연구·관찰용이며 매수 주문을 생성하지 않는다.
+규칙을 사용하지 않는다. 반환값은 연구·관찰용이며 매수 주문을 생성하지
+않는다.
 """
 
 from __future__ import annotations
@@ -20,7 +21,10 @@ from ..signals.core import (
     _prepare,
 )
 
-ANNUAL_DISCLAIMER_KO = "무료 공개 데이터 기반 연구·관찰용 결과이며 투자 권고나 매수 신호가 아닙니다."
+ANNUAL_DISCLAIMER_KO = (
+    "무료 공개 데이터 기반 연구·관찰용 결과이며 "
+    "투자 권고나 매수 신호가 아닙니다."
+)
 EARLY_RECOMMENDATION_KO = "관찰 전용 · 매수 추천 아님"
 
 
@@ -481,7 +485,9 @@ def annual_leadership_report(
             .groupby("theme", sort=True, as_index=False)
             .tail(1)
         )
-        latest = latest.loc[latest["early_watch"] | latest["early_confirmed"]].reset_index(drop=True)
+        latest = latest.loc[
+            latest["early_watch"] | latest["early_confirmed"]
+        ].reset_index(drop=True)
     return {
         "annual_leaders": annual,
         "early_signals": early,

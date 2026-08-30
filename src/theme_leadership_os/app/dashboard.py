@@ -150,7 +150,9 @@ def _flat_row(row: Mapping[str, Any]) -> dict[str, Any]:
         "자료 신뢰도": f'{_number(row.get("data_confidence"), 0.0):.1f}%',
         "기준일": row.get("as_of") or "알 수 없음",
         "자료 경과": (
-            f'{row["freshness_days"]}일 전' if row.get("freshness_days") is not None else "알 수 없음"
+            f'{row["freshness_days"]}일 전'
+            if row.get("freshness_days") is not None
+            else "알 수 없음"
         ),
         "위험 경고": ", ".join(str(flag) for flag in flags),
     }
@@ -170,9 +172,14 @@ def _render_candidate(st: Any, row: Mapping[str, Any]) -> None:
     columns[0].metric("신호 점수", f"{score:.1f}/100")
     columns[1].metric("자료 신뢰도", f"{confidence:.1f}%")
     columns[2].metric("기준일", str(row.get("as_of") or "알 수 없음"))
+    freshness = (
+        f'{row.get("freshness_days")}일'
+        if row.get("freshness_days") is not None
+        else "알 수 없음"
+    )
     columns[3].metric(
         "자료 경과",
-        f'{row.get("freshness_days")}일' if row.get("freshness_days") is not None else "알 수 없음",
+        freshness,
     )
 
     if flags and flags != ["none flagged"]:
@@ -225,12 +232,21 @@ def render_dashboard(
         except Exception:
             return 2
     rows, source = load_scorecard(data_path)
-    st.set_page_config(page_title="Theme Leadership OS · 테마 주도권 리서치", page_icon="🧭", layout="wide")
+    st.set_page_config(
+        page_title="Theme Leadership OS · 테마 주도권 리서치",
+        page_icon="🧭",
+        layout="wide",
+    )
     st.title("Theme Leadership OS")
-    st.caption("로컬 우선 리서치 콘솔 · 투명한 점수표 · 실시간 자동 수집 없음")
+    st.caption(
+        "로컬 우선 리서치 콘솔 · 투명한 점수표 · 실시간 자동 수집 없음"
+    )
     # Keep the safety language visually prominent on every render.
     st.error("연구·관찰용 결과이며 투자 권고가 아닙니다")
-    st.info(f"자료 출처: {source}. 점수는 연구 가설이며 개인화된 조언이 아닙니다.")
+    st.info(
+        f"자료 출처: {source}. "
+        "점수는 연구 가설이며 개인화된 조언이 아닙니다."
+    )
 
     if rows:
         as_of_values = [str(row.get("as_of")) for row in rows if row.get("as_of")]
@@ -242,7 +258,8 @@ def render_dashboard(
     st.subheader("점수 읽는 법")
     st.markdown(
         "합성 점수는 구성요소를 공개합니다: **모멘텀 40% · breadth 25% · "
-        "품질 20% · 위험 통제 15%**. 자료 신뢰도는 커버리지와 최신성을 뜻하며 "
+        "품질 20% · 위험 통제 15%**. 자료 신뢰도는 커버리지와 최신성을 "
+        "뜻하며 "
         "성과 확률이 아닙니다."
     )
 
