@@ -1,0 +1,38 @@
+version: 1
+themes:
+  - theme_id: solar
+    name: Solar energy
+    description: Solar generation, modules, inverters, and adjacent equipment.
+    category: clean_energy
+    is_negative_control: false
+    historical_data_status: partial
+  - theme_id: quantum_computing
+    name: Quantum computing
+    description: Public companies with a material quantum-computing exposure.
+    category: frontier_computing
+    is_negative_control: false
+    historical_data_status: partial
+  - theme_id: evtol
+    name: eVTOL and advanced air mobility
+    description: Electric vertical takeoff and landing aircraft developers.
+    category: advanced_mobility
+    is_negative_control: false
+    historical_data_status: partial_delisted
+  - theme_id: broad_market
+    name: Broad market negative control
+    description: Liquid broad-market benchmark used as a non-theme control.
+    category: negative_control
+    is_negative_control: true
+    historical_data_status: complete
+  - theme_id: traditional_oil
+    name: Traditional oil negative control
+    description: Conventional energy benchmark used as a non-theme control.
+    category: negative_control
+    is_negative_control: true
+    historical_data_status: complete
+  - theme_id: consumer_staples
+    name: Consumer staples negative control
+    description: Defensive consumer benchmark used as a non-theme control.
+    category: negative_control
+    is_negative_control: true
+    historical_data_status: complete

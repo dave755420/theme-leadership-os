@@ -1,0 +1,22 @@
+version: 1
+sources:
+  - source_id: catalog:themes
+    uri: data/catalog/themes.yaml
+    sha256: ae150d8b5c7023f7e73a4d592e2a057e4e6e07843b6f90fad3c3d868ec087543
+    retrieved_at: 2026-08-30
+    evidence_available_at: 2026-08-30
+    content_type: text/yaml
+    row_count: 6
+    complete: true
+    redistributable: true
+    notes: Curated compact catalog metadata.
+  - source_id: catalog:memberships
+    uri: data/catalog/memberships.csv
+    sha256: 10f55ac77751a323ed4caf9d9a47f84dcae89d079d36a5bb0e5cec9ea4ede1de
+    retrieved_at: 2026-08-30
+    evidence_available_at: 2026-08-30
+    content_type: text/csv
+    row_count: 20
+    complete: false
+    redistributable: true
+    notes: Daily historical price coverage is intentionally partial; LILM has no fabricated post-coverage rows.

@@ -1,0 +1,73 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "theme-leadership-os"
+version = "0.1.0"
+description = "Free-data, point-in-time theme leadership research and validation."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.11"
+authors = [
+  { name = "Theme Leadership OS contributors" },
+]
+keywords = ["research", "themes", "signals", "point-in-time", "validation"]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering :: Information Analysis",
+]
+dependencies = [
+  "numpy>=1.26,<3",
+  "pandas>=2.2,<3",
+]
+
+[project.optional-dependencies]
+catalog = [
+  "PyYAML>=6,<7",
+]
+personal-research = [
+  "PyYAML>=6,<7",
+  "yfinance>=0.2.54,<1",
+]
+cli = [
+  "PyYAML>=6,<7",
+  "typer>=0.12,<1",
+]
+app = [
+  "PyYAML>=6,<7",
+  "streamlit>=1.40,<2",
+  "typer>=0.12,<1",
+]
+dev = [
+  "PyYAML>=6,<7",
+  "pytest>=8,<9",
+  "ruff>=0.6,<1",
+  "typer>=0.12,<1",
+]
+
+[project.scripts]
+theme-leadership = "theme_leadership_os.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"

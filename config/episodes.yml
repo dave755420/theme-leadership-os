@@ -1,0 +1,27 @@
+# Frozen validation protocol.  Values are decimal fractions, not percentages.
+# Sentinel/negative-control metadata never changes these thresholds.
+major_surge:
+  horizon_weeks: 52
+  min_theme_gain: 0.80
+  min_spy_excess: 0.40
+  min_theme_rank_percentile: 0.90
+  min_breadth_up: 0.60
+  min_breadth_beat_spy: 0.50
+  min_valid_names: 4
+explosive:
+  min_theme_gain: 1.00
+  subset_of: major_surge
+onset:
+  lookback_weeks: 26
+  merge_gap_weeks: 13
+early_hit:
+  persistence_count: 2
+  persistence_window_weeks: 3
+  onset_before_weeks: 4
+  onset_after_weeks: 8
+  max_realized_log_fraction: 0.25
+forward_labels:
+  horizons_weeks: [13, 26, 52]
+  execution: next_session
+walk_forward:
+  embargo_weeks: 4

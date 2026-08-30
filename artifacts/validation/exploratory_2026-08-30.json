@@ -1,0 +1,64 @@
+{
+  "status": "exploratory_rejected",
+  "as_of": "2026-08-30",
+  "data": {
+    "source": "Nasdaq public historical endpoint",
+    "start": "2018-01-01",
+    "end": "2026-08-30",
+    "downloaded_symbols": 50,
+    "theme_series": 37,
+    "weekly_cross_sections": 400,
+    "total_return_adjusted": false,
+    "point_in_time_membership_complete": false,
+    "missing_delisted_symbols": ["LILM", "NOVA"]
+  },
+  "models": {
+    "m0_26w_relative_strength": {
+      "mean_rank_ic_26w": 0.1141295019,
+      "median_rank_ic_26w": 0.1357278331,
+      "mean_top_bottom_excess_26w": 0.0200090695
+    },
+    "legacy_composite": {
+      "decision": "rejected",
+      "mean_rank_ic_26w": 0.0879257383,
+      "median_rank_ic_26w": 0.1216251278,
+      "mean_top_bottom_excess_26w": 0.0069690318,
+      "confirmation_events": 473,
+      "weighted_precision": 0.1289640592
+    }
+  },
+  "sentinel_windows": [
+    {
+      "series": "TAN",
+      "start": "2020-06-26",
+      "end": "2020-12-25",
+      "return": 1.946,
+      "signal_date": "2020-07-03",
+      "signal_type": "confirmed"
+    },
+    {
+      "series": "SOLAR_PURE",
+      "start": "2020-04-03",
+      "end": "2020-10-02",
+      "return": 2.493,
+      "signal_date": "2020-02-21",
+      "signal_type": "confirmed"
+    },
+    {
+      "series": "QUANTUM_PURE",
+      "start": "2024-06-28",
+      "end": "2024-12-27",
+      "return": 17.04,
+      "signal_date": null,
+      "signal_type": null
+    },
+    {
+      "series": "EVTOL_PURE",
+      "start": "2024-06-28",
+      "end": "2024-12-27",
+      "return": 1.256,
+      "signal_date": null,
+      "signal_type": null
+    }
+  ]
+}
