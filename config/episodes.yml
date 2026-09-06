@@ -1,5 +1,6 @@
-# Frozen validation protocol.  Values are decimal fractions, not percentages.
+# Frozen validation protocol. Values are decimal fractions, not percentages.
 # Sentinel/negative-control metadata never changes these thresholds.
+protocol_version: early-validation-v1
 major_surge:
   horizon_weeks: 52
   min_theme_gain: 0.80
@@ -31,6 +32,28 @@ early_rise_signal:
   min_26w_spy_excess: -0.30
   confirmation_count: 2
   confirmation_window_weeks: 3
+early_score_weights:
+  acceleration_rank: 0.30
+  rs_rank_4w: 0.25
+  rank_improvement_4v13: 0.15
+  breadth_4w: 0.15
+  participation: 0.15
+validation:
+  research_min_coverage: 0.70
+  certification_min_coverage: 0.95
+  min_cross_section_themes: 15
+  oos_start: 2019-01-01
+  oos_end: 2025-12-31
+  min_rank_ic_26w: 0.05
+  min_ic_improvement_vs_m0: 0.02
+  min_top_bucket_excess_improvement: 0.02
+early_discovery_acceptance:
+  min_episode_recall: 0.70
+  max_false_discovery_rate: 0.35
+  max_median_signal_lag_weeks: 2
+  min_median_remaining_move: 0.60
+  min_independent_episodes: 30
+  min_episode_themes: 10
 forward_labels:
   horizons_weeks: [13, 26, 52]
   execution: next_session
