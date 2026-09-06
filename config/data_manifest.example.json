@@ -1,0 +1,11 @@
+{
+  "schema": "theme_leadership_data_manifest.v1",
+  "total_return_adjusted": false,
+  "point_in_time_membership_complete": false,
+  "delisting_complete": false,
+  "source_registry_frozen": false,
+  "availability_semantics_frozen": false,
+  "portfolio_backtest_complete": false,
+  "portfolio_backtest_passed": false,
+  "notes": "Set a flag to true only when the underlying dataset or backtest pack contains auditable evidence for that claim. This example intentionally defaults to false so it cannot certify exploratory data by accident."
+}
