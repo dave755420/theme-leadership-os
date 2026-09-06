@@ -133,7 +133,7 @@ def _availability_audit(data: pd.DataFrame) -> tuple[str | None, int | None]:
         return None, None
     available = pd.to_datetime(data[column], errors="coerce", utc=True)
     observed = pd.to_datetime(data["date"], errors="coerce", utc=True)
-    observation_end = observed.dt.normalize() + pd.Timedelta(days=1)
+    observation_end = observed.dt.normalize() + pd.Timedelta("1D")
     violations = available.isna() | observed.isna() | available.ge(observation_end)
     return column, int(violations.sum())
 
@@ -264,11 +264,10 @@ def _weekly_rank_metrics(
         valid = group[[score_column, outcome_column]].dropna()
         if len(valid) < min_assets:
             continue
-        ic = valid[score_column].corr(
-            valid[outcome_column],
-            method="spearman",
-        )
-        score_rank = valid[score_column].rank(
+        score_ordinal = valid[score_column].rank(method="average")
+        outcome_ordinal = valid[outcome_column].rank(method="average")
+        ic = score_ordinal.corr(outcome_ordinal)
+        score_rank = score_ordinal.rank(
             pct=True,
             method="average",
         )
