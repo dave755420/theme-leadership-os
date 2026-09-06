@@ -7,8 +7,9 @@ small stdlib-only parser fallback so core validation does not require PyYAML.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 PROTOCOL_PATH = Path(__file__).resolve().parents[3] / "config" / "episodes.yml"
 
