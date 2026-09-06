@@ -28,7 +28,9 @@ def _panel(periods: int = 190, themes: int = 18) -> pd.DataFrame:
         for j in range(themes):
             theme = f"T{j:02d}"
             if j == 0:
-                weekly = -0.005 if i < 75 else (0.035 if i < 115 else 0.004)
+                # Keep the 13-week rank weak long enough for 4-week acceleration
+                # to persist for the frozen 2-of-3 confirmation rule.
+                weekly = -0.01 if i < 75 else (0.025 if i < 115 else 0.004)
             else:
                 weekly = 0.0005 + j * 0.00003
             levels[theme] *= 1.0 + weekly
@@ -81,7 +83,7 @@ def test_missing_data_manifest_is_never_promoted_to_pass() -> None:
 
 def test_temporal_violation_aborts_metrics() -> None:
     frame = _panel()
-    frame.loc[0, "available_at"] = pd.Timestamp(frame.loc[0, "date"]) + pd.Timedelta(days=1)
+    frame.loc[0, "available_at"] = pd.Timestamp(frame.loc[0, "date"]) + pd.Timedelta("1D")
     try:
         validate_early_radar(frame, data_manifest=_manifest())
     except ValueError as exc:
