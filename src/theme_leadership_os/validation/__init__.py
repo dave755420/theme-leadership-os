@@ -1,6 +1,6 @@
 """Validation primitives for the Theme Leadership OS.
 
-The package is intentionally data-source agnostic.  Callers provide prices,
+The package is intentionally data-source agnostic. Callers provide prices,
 signals, features, and metadata; validation functions return deterministic
 tables/reports that can be persisted alongside a backtest.
 """
@@ -48,6 +48,7 @@ from .early_hits import (
     evaluate_early_hit,
     evaluate_early_hits,
 )
+from .early_validation import EarlyValidationResult, validate_early_radar
 from .episodes import (
     DEFAULT_BREADTH,
     DEFAULT_BREADTH_BEAT_SPY,
@@ -86,6 +87,12 @@ from .metrics import (
     rank_ic,
     rank_ic_by_date,
     top_bottom_metrics,
+)
+from .protocol import (
+    PROTOCOL_PATH,
+    early_signal_config_from_protocol,
+    load_protocol,
+    protocol_alignment_mismatches,
 )
 from .splits import (
     DEFAULT_EMBARGO_WEEKS,
@@ -133,6 +140,12 @@ __all__ = [
     "early_hit_metrics",
     "evaluate_early_hit",
     "evaluate_early_hits",
+    "EarlyValidationResult",
+    "validate_early_radar",
+    "PROTOCOL_PATH",
+    "early_signal_config_from_protocol",
+    "load_protocol",
+    "protocol_alignment_mismatches",
     "DEFAULT_BREADTH",
     "DEFAULT_BREADTH_BEAT_SPY",
     "DEFAULT_EPISODE_HORIZON_WEEKS",

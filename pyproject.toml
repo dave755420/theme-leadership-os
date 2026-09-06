@@ -54,6 +54,7 @@ dev = [
 
 [project.scripts]
 theme-leadership = "theme_leadership_os.cli:main"
+theme-leadership-validate-early = "theme_leadership_os.early_validate_cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
